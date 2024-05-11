@@ -21,7 +21,7 @@ You can install the necessary libraries using pip:
 
 # Installation
 - Clone the repo:
-```git clone https://github.com/your_username_/Project-Name.git```
+```git clone https://github.com/tomaszelenka/engeto-project-3.git```
 - Install Python packages:
 ```pip install -r requirements.txt```
 
