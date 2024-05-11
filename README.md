@@ -45,5 +45,7 @@ This command will scrape data from the provided URL and save the processed elect
 
 > Exiting: Election-scraper
 
+![image](https://github.com/tomaszelenka/engeto-project-3/assets/30825620/8db89db7-edb9-4fe3-b762-68f9ade0124e)
+
 
 
