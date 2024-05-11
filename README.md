@@ -20,9 +20,9 @@ You can install the necessary libraries using pip:
 ```pip install beautifulsoup4 requests```
 
 # Installation
-Clone the repo:
+- Clone the repo:
 ```git clone https://github.com/your_username_/Project-Name.git```
-Install Python packages:
+- Install Python packages:
 ```pip install -r requirements.txt```
 
 ## Usage
