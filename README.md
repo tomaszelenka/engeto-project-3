@@ -13,11 +13,6 @@ To get a local copy up and running follow these simple steps.
 # Prerequisites
 - Python 3.6 or higher
 - pip
-- BeautifulSoup4
-- Requests
-
-You can install the necessary libraries using pip:
-```pip install beautifulsoup4 requests```
 
 # Installation
 - Clone the repo:
