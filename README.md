@@ -32,10 +32,16 @@ This script requires two command-line arguments:
 2. The file name for the output CSV.
 # Running the Script
 To run the script, use the following command:
-python projekt_3.py [URL] [output_file.csv]
+```python projekt_3.py [URL] [output_file.csv]```
 
 # Example
 Here's an example command using a URL:
 
-python projekt_3.py 'https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103' 'election_data.csv'
-This command will scrape data from the provided URL and save the processed election results to election_data.csv.
+This command will scrape data from the provided URL and save the processed election results to election_data.csv:
+```python projekt_3.py 'https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103' 'vysledky-prostejov.csv'```
+> Donwloading data from URL: https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103
+> Saving to file: vysledky-prostejov.csv
+> Exiting: Election-scraper
+
+
+
