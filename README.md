@@ -40,7 +40,9 @@ Here's an example command using a URL:
 This command will scrape data from the provided URL and save the processed election results to election_data.csv:
 ```python projekt_3.py 'https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103' 'vysledky-prostejov.csv'```
 > Donwloading data from URL: https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103
+
 > Saving to file: vysledky-prostejov.csv
+
 > Exiting: Election-scraper
 
 
