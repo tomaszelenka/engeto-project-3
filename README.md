@@ -1,6 +1,6 @@
 ### Engeto Project 3 - Election Scraper
 ## About the Project
-This project is the third assignment for the Engeto Online Python Academy. It scrapes election data from a specified URL and processes various election statistics such as codes, locations, registered voters, envelopes, and valid votes. Finally, it saves the compiled data to a CSV file.
+This project is the third assignment for the Engeto Python Academy. It scrapes election data from a specified URL (pertaining to the 2017 elections in the Czech Republic; the link is [here](https://volby.cz/pls/ps2017nss/ps3?xjazyk=CZ)) and processes various election statistics, such as locations, counts of registered voters, envelopes, valid votes, and election results. Finally, it compiles the data and saves it to a CSV file.
 
 # Built With
 - Python 3
@@ -28,8 +28,8 @@ You can install the necessary libraries using pip:
 ## Usage
 This script requires two command-line arguments:
 
-- A valid URL where the election data is located.
-- The file name for the output CSV.
+1. A valid URL where the election data is located.
+2. The file name for the output CSV.
 # Running the Script
 To run the script, use the following command:
 python projekt_3.py [URL] [output_file.csv]
