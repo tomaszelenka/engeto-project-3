@@ -7,9 +7,6 @@ This project is the third assignment for the Engeto Python Academy. It scrapes e
 - BeautifulSoup4
 - Requests
 
-## Getting Started
-To get a local copy up and running follow these simple steps.
-
 # Prerequisites
 - Python 3.6 or higher
 - pip
