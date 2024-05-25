@@ -11,11 +11,15 @@ import csv
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 
+cache_http = {}
+
 def get_soup(url):
-    response = rq.get(url)
-    response.encoding = 'utf-8'
-    
-    return bs(response.text, 'html.parser')
+    if url not in cache_http:
+        response = rq.get(url)
+        response.encoding = 'utf-8'
+        cache_http[url] = bs(response.text, 'html.parser')
+
+    return cache_http[url]
 
 
 def get_urls_with_x(soup):
@@ -25,33 +29,23 @@ def get_urls_with_x(soup):
     
     return x_urls
 
-def get_code(link) -> dict:
-    soup = get_soup(link)
+
+
+def get_data(soup, class_name, dict_key):
     rows = soup.find_all('tr')
-    dict_code = {'code': []}
+    data_dict = {dict_key: []}
     for row in rows:
-        element = row.find("td", {"class": "cislo"})
+        element = row.find("td", {"class": class_name})
         if element:
             cleardata = element.text.strip()
-            dict_code['code'].append(cleardata)
-        else:
-            continue
-    
-    return dict_code
+            data_dict[dict_key].append(cleardata)
+    return data_dict
+
+def get_code(link) -> dict:
+    return get_data(get_soup(link), "cislo", "code")
 
 def get_location(link) -> dict:
-    soup = get_soup(link)
-    rows = soup.find_all('tr')
-    dict_location = {'location': []}
-    for row in rows:
-        element = row.find("td", {"class": "overflow_name"})
-        if element:
-            cleardata = element.text.strip()
-            dict_location['location'].append(cleardata)
-        else:
-            continue
-    
-    return dict_location
+    return get_data(get_soup(link), "overflow_name", "location")
 
 def get_registered(urls):
     dict_registered = {'registered': []}
@@ -240,8 +234,3 @@ if __name__ == "__main__":
     print(f"Saving to file: {name_file}")
     save_csv(get_code_dict, get_location_dict, get_registered_dict, get_envelopes_dict, get_valid_dict, get_results_dict, name_file)
     print(f"Exiting: Election-scraper")
-
-   
-
-
-   
