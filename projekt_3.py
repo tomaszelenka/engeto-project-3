@@ -6,16 +6,17 @@ discord: .toze.
 '''
 
 import sys
-import requests as rq
+import requests_cache as rq
 import csv
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 
+session = rq.CachedSession('http_cache', expire_after=300)
 cache_http = {}
 
 def get_soup(url):
     if url not in cache_http:
-        response = rq.get(url)
+        response = session.get(url)
         response.encoding = 'utf-8'
         cache_http[url] = bs(response.text, 'html.parser')
 
@@ -47,80 +48,65 @@ def get_code(link) -> dict:
 def get_location(link) -> dict:
     return get_data(get_soup(link), "overflow_name", "location")
 
-def get_registered(urls):
-    dict_registered = {'registered': []}
-    for url in urls:
-        soup = get_soup(url)
 
-        if 'vyber' not in url: # multichoice
-            total_sum = 0
-            sub_urls = get_sub_urls(url, 'cislo', 's1') # URLs
-            
-            for url in sub_urls:
-                sub_soup = get_soup(url)
-                value_elements = sub_soup.find_all('td', class_='cislo', headers='sa2') # DATA
-                        
-                for element in value_elements:
-                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
-                    total_sum += int(cleardata)
-            
-            dict_registered['registered'].append(total_sum)
-        else:
-            value = soup.find("td", class_="cislo", headers="sa2") # DATA
-            cleardata = value.text.strip().replace('\xa0', '').replace(' ', '') if value else '0'
-            dict_registered['registered'].append(int(cleardata))
-
-    return dict_registered
-
-def get_envelopes(urls):
-    dict_envelopes = {'envelopes': []}
-    for url in urls:
-        soup = get_soup(url)
-
-        if 'vyber' not in url: # multichoice
-            total_sum = 0
-            sub_urls = get_sub_urls(url, 'cislo', 's1') # URLs
-            
-            for url in sub_urls:
-                sub_soup = get_soup(url)
-                value_elements = sub_soup.find_all('td', class_='cislo', headers='sa3') # DATA
-                        
-                for element in value_elements:
-                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
-                    total_sum += int(cleardata)
-            
-            dict_envelopes['envelopes'].append(total_sum)
-        else:
-            value = soup.find("td", class_="cislo", headers="sa3") # DATA
-            cleardata = value.text.strip().replace('\xa0', '').replace(' ', '') if value else '0'
-            dict_envelopes['envelopes'].append(int(cleardata))
-   
-    return dict_envelopes
-
-def get_valid(urls):
-    dict_valid = {'valid': []}
-    for url in urls:
-        soup = get_soup(url)
-
-        if 'vyber' not in url: # multichoice
-            total_sum = 0
-            sub_urls = get_sub_urls(url, 'cislo', 's1') # URLs
-            
-            for url in sub_urls:
-                sub_soup = get_soup(url)
-                value_elements = sub_soup.find_all('td', class_='cislo', headers='sa6') # DATA
-                        
-                for element in value_elements:
-                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
-                    total_sum += int(cleardata)
-            
-            dict_valid['valid'].append(total_sum)
-        else:
-            value = soup.find("td", class_="cislo", headers="sa6") # DATA
-            cleardata = value.text.strip().replace('\xa0', '').replace(' ', '') if value else '0'
-            dict_valid['valid'].append(int(cleardata))
+def get_data_voters(urls):
+    data = {
+        'registered': [],
+        'envelopes': [],
+        'valid': []
+    }
     
-    return dict_valid
+    for url in urls:
+        soup = get_soup(url)
+
+        if 'vyber' not in url:  # multichoice
+            total_registered = 0
+            total_envelopes = 0
+            total_valid = 0
+            sub_urls = get_sub_urls(url, 'cislo', 's1')  # URLs
+            
+            for sub_url in sub_urls:
+                sub_soup = get_soup(sub_url)
+                
+                # Registered data
+                value_elements_registered = sub_soup.find_all('td', class_='cislo', headers='sa2')
+                for element in value_elements_registered:
+                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
+                    total_registered += int(cleardata)
+                
+                # Envelopes data
+                value_elements_envelopes = sub_soup.find_all('td', class_='cislo', headers='sa3')
+                for element in value_elements_envelopes:
+                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
+                    total_envelopes += int(cleardata)
+                
+                # Valid data
+                value_elements_valid = sub_soup.find_all('td', class_='cislo', headers='sa6')
+                for element in value_elements_valid:
+                    cleardata = element.text.strip().replace('\xa0', '').replace(' ', '')
+                    total_valid += int(cleardata)
+                
+            data['registered'].append(total_registered)
+            data['envelopes'].append(total_envelopes)
+            data['valid'].append(total_valid)
+        else:
+            # Registered data
+            value_registered = soup.find("td", class_="cislo", headers="sa2")
+            cleardata_registered = value_registered.text.strip().replace('\xa0', '').replace(' ', '') if value_registered else '0'
+            data['registered'].append(int(cleardata_registered))
+            
+            # Envelopes data
+            value_envelopes = soup.find("td", class_="cislo", headers="sa3")
+            cleardata_envelopes = value_envelopes.text.strip().replace('\xa0', '').replace(' ', '') if value_envelopes else '0'
+            data['envelopes'].append(int(cleardata_envelopes))
+            
+            # Valid data
+            value_valid = soup.find("td", class_="cislo", headers="sa6")
+            cleardata_valid = value_valid.text.strip().replace('\xa0', '').replace(' ', '') if value_valid else '0'
+            data['valid'].append(int(cleardata_valid))
+
+    return data
+
 
 def get_results(urls):
     data = {}
@@ -184,8 +170,8 @@ def get_sub_urls(url, class_name, headers_value):
     return sub_x_urls
 
 
-def save_csv(data_code, data_location, data_registered, data_envelopes, data_valid, data_results, name_file):
-    combined_dict = {**data_code, **data_location, **data_registered, **data_envelopes, **data_valid, **data_results}
+def save_csv(data_code, data_location, data_multi, data_results, name_file):
+    combined_dict = {**data_code, **data_location, **data_multi, **data_results}
     with open(name_file, 'w', newline='', encoding='utf-8-sig') as csv_file:
         headers = list(combined_dict.keys())
         writer = csv.DictWriter(csv_file, fieldnames=headers, delimiter=';')
@@ -226,11 +212,11 @@ if __name__ == "__main__":
     get_urlsx = get_urls_with_x(get_html)
     get_code_dict = get_code(link)
     get_location_dict = get_location(link)
-    get_registered_dict = get_registered(get_urlsx)
-    get_envelopes_dict = get_envelopes(get_urlsx)
-    get_valid_dict = get_valid(get_urlsx)
+
+    get_multidata_dict = get_data_voters(get_urlsx)
+
     get_results_dict = get_results(get_urlsx)
 
     print(f"Saving to file: {name_file}")
-    save_csv(get_code_dict, get_location_dict, get_registered_dict, get_envelopes_dict, get_valid_dict, get_results_dict, name_file)
+    save_csv(get_code_dict, get_location_dict, get_multidata_dict, get_results_dict, name_file)
     print(f"Exiting: Election-scraper")
