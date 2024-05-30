@@ -5,7 +5,7 @@ This project is the third assignment for the Engeto Python Academy. It scrapes e
 # Built With
 - Python 3
 - BeautifulSoup4
-- Requests
+- Requests-cache
 
 # Prerequisites
 - Python 3.6 or higher
